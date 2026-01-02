@@ -1,0 +1,30 @@
+.container {
+  max-width: 420px;
+  margin: 4rem auto;
+  font-family: system-ui, sans-serif;
+}
+
+h1 {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+select {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.selected {
+  margin-top: 1rem;
+  color: #333;
+}
+
+.error {
+  margin-bottom: 1rem;
+  color: darkred;
+}
