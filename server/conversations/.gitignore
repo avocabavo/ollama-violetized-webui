@@ -1,0 +1,5 @@
+# Ignore all conversation files
+*.json
+
+# But keep this directory in the repo
+!.gitignore
