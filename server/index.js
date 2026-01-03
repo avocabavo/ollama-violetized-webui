@@ -48,7 +48,6 @@ app.post("/api/conversations", (req, res) => {
         model,
         createdAt: new Date().toISOString(),
         messages: [],
-        stream: false,
     };
 
     fs.writeFileSync(filePath, JSON.stringify(conversation, null, 2));
@@ -171,7 +170,42 @@ app.put("/api/conversations/:file", (req, res) => {
     } catch (err) {
         res.status(500).json({ error: "Failed to update conversation" });
     }
-})
+});
+
+/**
+ * POST /api/run/:file
+ * Generate the next message in the conversation
+ */
+app.post("/api/run/:name", async (req, res) => {
+    const { model, messages } = req.body;
+
+    const ollamaRes = await fetch(OLLAMA_HOST + "/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            model,
+            messages,
+            stream: true,
+        }),
+    });
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    const reader = ollamaRes.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        res.write(chunk);
+    }
+
+    res.end();
+});
 
 app.listen(PORT, ()=> {
     console.log(`Backend listening on http://localhost:${PORT}`);
