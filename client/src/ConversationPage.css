@@ -1,39 +1,98 @@
-.container {
-  max-width: 800px;
-  margin: 2rem auto;
-  font-family: system-ui, sans-serif;
-}
-
-.conversation-header {
-  margin-bottom: 2rem;
-}
-
-.model {
-  color: #555;
-  font-size: 0.9rem;
-}
-
 .messages {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
-.message label {
+.message {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  font-weight: 500;
+  width: 75%;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  position: relative;
 }
 
-textarea {
+.message-system {
+  align-self: center;
+  background: #f0f0f0;
+  text-align: center;
+}
+
+.message-user {
+  align-self: flex-end;
+  background: #dcf8c6; /* light green typical chat bubble */
+}
+
+.message-assistant {
+  align-self: flex-start;
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+.message-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.role-select {
+  width: 75%;
+  padding: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.include-in-query {
+  width: 1rem;
+  height: 1rem;
+  cursor: default;
+}
+
+.message textarea {
   width: 100%;
+  border: none;
+  background: darkslategray;
   resize: vertical;
-  padding: 0.6rem;
   font-family: inherit;
   font-size: 1rem;
+  margin-top: 0.2rem;
 }
 
-.error {
-  color: darkred;
+.message textarea:focus {
+  outline: none;
+}
+
+
+.add-message {
+  margin-top: 1rem;
+  align-self: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  color: black;
+  background: #f7f7f7;
+  cursor: pointer;
+}
+
+
+
+
+.container {
+  width: 100%;
+  max-width: none;
+  padding: 1rem 2rem;
+  margin: auto;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+.model {
+  margin-bottom: 1rem;
+}
+
+#root {
+  width: 100%;
 }

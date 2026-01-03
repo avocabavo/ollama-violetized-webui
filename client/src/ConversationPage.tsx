@@ -1,25 +1,47 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useParams } from "react-router-dom";
+import MessageCard from "./components/MessageCard";
+import type { Conversation, Message } from "./types";
 import "./ConversationPage.css"
 
 const BACK_END_URL = "http://localhost:3001/api";
-
-interface Message {
-    role?: string;
-    content: string;
-}
-
-interface Conversation {
-    name: string;
-    model: string;
-    createdAt: string;
-    messages: Message[];
-}
+const DEBOUNCE_MS = 500; // Half second debounce
 
 export default function ConversationPage() {
     const { file } = useParams<{ file: string }>();
     const [conversation, setConversation] = useState<Conversation | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    const addMessage = async () => {
+        const res = await fetch(
+            BACK_END_URL + "/conversations/" + file + "/messages",
+            { method: "POST" },
+        );
+
+        if (!res.ok) return;
+
+        const newMessage = await res.json();
+
+        setConversation((prev)=>
+            prev
+                ? { ...prev, messages: [...prev.messages, newMessage] }
+                : prev
+        );
+    };
+
+    const updateMessage = (
+        index: number,
+        patch: Partial<Message>
+    ) => {
+        setConversation((prev)=> {
+            if (!prev) return prev;
+
+            const messages = [...prev.messages];
+            messages[index] = { ...messages[index], ...patch};
+
+            return { ...prev, messages };
+        });
+    };
 
     useEffect(() => {
         fetch(BACK_END_URL + "/conversations/" + file)
@@ -30,6 +52,33 @@ export default function ConversationPage() {
             .then((data) => setConversation(data))
             .catch((err) => setError(err.message));
     }, [file]);
+
+    const saveTimeout = useRef<number | null>(null);
+
+    useEffect(() => {
+        if (!conversation) return;
+
+        if (saveTimeout.current) {
+            clearTimeout(saveTimeout.current);
+        }
+
+        saveTimeout.current = window.setTimeout(async () => {
+            await fetch(
+                BACK_END_URL + "/conversations/" + file,
+                {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(conversation),
+                }
+            );
+        }, DEBOUNCE_MS);
+    }, [conversation]);
+
+    const bottomRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(()=> {
+        bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
+    }, [conversation?.messages.length]);
 
     if (error) {
         return <div className="container error">{error}</div>;
@@ -47,19 +96,21 @@ export default function ConversationPage() {
             </header>
 
             <div className="messages">
-                {conversation.messages.map((msg, idx) => (
-                    <div key={idx} className="message">
-                        <label>
-                            Message {idx + 1}
-                            <textarea
-                                value={msg.content}
-                                readOnly
-                                rows={Math.max(3, msg.content.split("\n").length)}
-                            />
-                        </label>
-                    </div>
+                {conversation?.messages.map((msg, idx) => (
+                    <MessageCard
+                        key={idx}
+                        message={msg}
+                        index={idx}
+                        updateMessage={updateMessage}
+                    />
                 ))}
             </div>
+
+            <button className="add-message" onClick={addMessage}>
+                + Add Message
+            </button>
+
+            <div ref={bottomRef} />
         </div>
     );
 }

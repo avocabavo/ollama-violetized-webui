@@ -104,12 +104,74 @@ app.get("/api/conversations/:file", (req, res)=> {
     }
 
     try {
-        const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+        const data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
         res.json(data);
     } catch (err) {
         res.status(500).json({ error: "Failed to read conversation" });
     }
 });
+
+/**
+ * POST /api/conversations/:file/messages
+ */
+app.post("/api/conversations/:file/messages", (req, res) => {
+    const { file } = req.params;
+
+    // Prevent path traversal
+    if (!/^[a-z0-9_.-]+\.json$/.test(file)) {
+        return res.status(400).json({ error: "Invalid filename" });
+    }
+
+    const filePath = path.join(CONVERSATIONS_DIR, file);
+
+    if (!fs.existsSync(filePath)) {
+        return res. status(404).json({ error: "Conversation not found" });
+    }
+
+    try {
+        const convo = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+
+        const newMessage = {
+            role: convo.messages.length == 0 ? "system" : "user",
+            content: "",
+            includeInQuery: true,
+        };
+
+        convo.messages.push(newMessage);
+
+        fs.writeFileSync(filePath, JSON.stringify(convo, null, 2));
+
+        res.json(newMessage);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to append message to conversation" });
+    }
+});
+
+/**
+ * PUT /api/conversations/:file
+ * Update a conversation
+ */
+app.put("/api/conversations/:file", (req, res) => {
+    const { file } = req.params;
+
+    // Prevent path traversal
+    if (!/^[a-z0-9_.-]+\.json$/.test(file)) {
+        return res.status(400).json({ error: "Invalid filename" });
+    }
+
+    const filePath = path.join(CONVERSATIONS_DIR, file);
+
+    if (!fs.existsSync(filePath)) {
+        return res. status(404).json({ error: "Conversation not found" });
+    }
+
+    try {
+        fs.writeFileSync(filePath, JSON.stringify(req.body, null, 2));
+        res.json({ ok: true });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to update conversation" });
+    }
+})
 
 app.listen(PORT, ()=> {
     console.log(`Backend listening on http://localhost:${PORT}`);
