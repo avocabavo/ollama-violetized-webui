@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { Message } from "../types.ts";
 
 type Props = {
@@ -14,6 +15,24 @@ export default function MessageCard({
     index,
     updateMessage,
 }: Props) {
+    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+    useEffect(()=> {
+        const el = textareaRef.current;
+        if (!el) return;
+
+        el.style.height = "auto";
+        el.style.height = `${el.scrollHeight}px`;
+    }, [message.content]);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            countTokens(index, message.content);
+        }, 4000);
+
+        return () => clearTimeout(timeout);
+    }, [message.content]);
+
     return (
         <div className={`message message-${message.role}`}>
             <div className="message-controls">
@@ -45,6 +64,7 @@ export default function MessageCard({
             </div>
 
             <textarea
+                ref={textareaRef}
                 value={message.content}
                 onChange={(e) =>
                     updateMessage(index, {

@@ -54,7 +54,8 @@
   width: 100%;
   border: none;
   background: darkslategray;
-  resize: vertical;
+  resize: none;
+  overflow: hidden;
   font-family: inherit;
   font-size: 1rem;
   margin-top: 0.2rem;
