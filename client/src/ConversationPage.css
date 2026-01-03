@@ -1,0 +1,39 @@
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  font-family: system-ui, sans-serif;
+}
+
+.conversation-header {
+  margin-bottom: 2rem;
+}
+
+.model {
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.message label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-weight: 500;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 0.6rem;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.error {
+  color: darkred;
+}

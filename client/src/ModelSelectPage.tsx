@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "./ModelSelectPage.css";
 
 const BACK_END_URL = "http://localhost:3001/api";
@@ -125,11 +126,13 @@ export default function ModelSelectPage() {
                     <ul>
                         {conversations.map((c) => (
                             <li key={c.file}>
-                                <div className="conv-name">{c.name}</div>
-                                <div className="conv-meta">
-                                    {c.model} .{" "}
-                                    {new Date(c.createdAt).toLocaleString()}1
-                                </div>
+                                <Link to={`/conversation/${c.file}`} className="conv-link">
+                                    <h3 className="conv-name">{c.name}</h3>
+                                    <div className="conv-meta">
+                                        {c.model} .{" "}
+                                        {new Date(c.createdAt).toLocaleString()}1
+                                    </div>
+                                </Link>
                             </li>
                         ))}
                     </ul>

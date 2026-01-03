@@ -85,6 +85,32 @@ app.get("/api/conversations", (req, res)=> {
     }
 });
 
+/**
+ * GET /api/conversations/:file
+ * Loads a single conversation JSON
+ */
+app.get("/api/conversations/:file", (req, res)=> {
+    const { file } = req. params;
+
+    // Prevent path traversal
+    if (!/^[a-z0-9_.-]+\.json$/.test(file)) {
+        return res.status(400).json({ error: "Invalid filename" });
+    }
+
+    const filePath = path.join(CONVERSATIONS_DIR, file);
+
+    if (!fs.existsSync(filePath)) {
+        return res. status(404).json({ error: "Conversation not found" });
+    }
+
+    try {
+        const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+        res.json(data);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to read conversation" });
+    }
+});
+
 app.listen(PORT, ()=> {
     console.log(`Backend listening on http://localhost:${PORT}`);
 });
