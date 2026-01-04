@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type { OllamaModel } from "./types";
-import "./ModelSelectPage.css";
+import "./ConversationSelectPage.css";
 
 interface ConversationSummary {
     file: string;
@@ -10,7 +10,7 @@ interface ConversationSummary {
     createdAt: string;
 }
 
-export default function ModelSelectPage() {
+export default function ConversationSelectPage() {
     const [models, setModels] = useState<OllamaModel[]>([]);
     const [selectedModel, setSelectedModel] = useState<string>("");
     const [conversationName, setConversationName] = useState("");
