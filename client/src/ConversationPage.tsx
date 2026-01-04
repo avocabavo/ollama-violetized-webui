@@ -4,7 +4,6 @@ import MessageCard from "./components/MessageCard";
 import type { Conversation, Message, OllamaModel } from "./types";
 import "./ConversationPage.css"
 
-const BACK_END_URL = "http://localhost:3001/api";
 const DEBOUNCE_UPDATE_MS = 500; // Half second debounce
 
 export default function ConversationPage() {
@@ -15,7 +14,7 @@ export default function ConversationPage() {
     const [models, setModels] = useState<OllamaModel[]>([]);
 
     useEffect(() => {
-        fetch(BACK_END_URL + "/models")
+        fetch("/api/models")
             .then((res) => res.json())
             .then((d) => setModels(d.models ?? []))
             .catch((err) => setError(err.message));
@@ -23,7 +22,7 @@ export default function ConversationPage() {
 
     const addMessage = async () => {
         const res = await fetch(
-            BACK_END_URL + "/conversations/" + file + "/messages",
+            "/api/conversations/" + file + "/messages",
             { method: "POST" },
         );
 
@@ -81,7 +80,7 @@ export default function ConversationPage() {
     };
 
     useEffect(() => {
-        fetch(BACK_END_URL + "/conversations/" + file)
+        fetch("/api/conversations/" + file)
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to load conversation");
                 return res.json();
@@ -101,7 +100,7 @@ export default function ConversationPage() {
 
         saveTimeout.current = window.setTimeout(async () => {
             await fetch(
-                BACK_END_URL + "/conversations/" + file,
+                "/api/conversations/" + file,
                 {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
@@ -150,7 +149,7 @@ export default function ConversationPage() {
         setRunning(true);
 
         const res = await fetch(
-            BACK_END_URL + "/run/" + file,
+            "/api/run/" + file,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -205,7 +204,7 @@ export default function ConversationPage() {
     ) => {
         if (!conversation) return;
 
-        const res = await fetch(BACK_END_URL + "/tokens", {
+        const res = await fetch("/api/tokens", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

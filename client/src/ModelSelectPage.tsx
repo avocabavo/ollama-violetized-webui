@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import type { OllamaModel } from "./types";
 import "./ModelSelectPage.css";
 
-const BACK_END_URL = "http://localhost:3001/api";
-
 interface ConversationSummary {
     file: string;
     name: string;
@@ -21,25 +19,12 @@ export default function ModelSelectPage() {
     const [conversations, setConversations] = useState<ConversationSummary[]>([]);
 
     useEffect(() => {
-        // async function fetchModels() {
-        //     try {
-        //         const res = await fetch("http://localhost:3001/api/models");
-        //         if (!res.ok) throw new Error("Backend error");
-        //         const data: OllamaTagsResponse = await res.json();
-        //         setModels(data.models ?? []);
-        //     } catch (err) {
-        //         setError((err as Error).message);
-        //     }
-        // }
-
-        // fetchModels();
-
-        fetch(BACK_END_URL + "/models")
+        fetch("/api/models")
             .then((r) => r.json())
             .then((d) => setModels(d.models ?? []))
             .catch(() => setError("Failed to load models"));
 
-        fetch(BACK_END_URL + "/conversations")
+        fetch("/api/conversations")
             .then((r) => r.json())
             .then((d) => setConversations(d.conversations ?? []))
             .catch(() => setError("Failed to load conversations"));
@@ -49,7 +34,7 @@ export default function ModelSelectPage() {
         setError(null);
         setSuccess(null);
         try {
-            const res = await fetch("http://localhost:3001/api/conversations", {
+            const res = await fetch("/api/conversations", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

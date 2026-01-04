@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import fs from "fs";
 import path from "path";
 import pkg from "@dqbd/tiktoken";
@@ -10,7 +9,6 @@ const PORT = 3001;
 const OLLAMA_HOST = "http://localhost:11434";
 const CONVERSATIONS_DIR = path.resolve("./conversations");
 
-app.use(cors({origin: "http://localhost:5173"}));
 app.use(express.json());
 
 /**
