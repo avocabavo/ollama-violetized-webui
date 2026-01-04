@@ -16,6 +16,51 @@
   padding: 0.3rem;
 }
 
+
+.message-row {
+  display: flex;
+  align-items: center;
+  width: 75%;
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  position: relative;
+}
+
+.message-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.message-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  opacity: 0.5;
+}
+.message-actions button:hover {
+  opacity: 1;
+}
+
+.message-row.message-assistant {
+  flex-direction: row;
+}
+
+.message-row.message-assistant .message-actions {
+  margin-right: 0.4rem;
+}
+
+.message-row.message-user,
+.message-row.message-system {
+  flex-direction: row-reverse;
+}
+
+.message-row.message-user .message-actions,
+.message-row.message-system .message-actions {
+  margin-left: 0.4rem;
+}
+
 .messages {
   display: flex;
   flex-direction: column;
@@ -23,12 +68,9 @@
 }
 
 .message {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  width: 75%;
-  padding: 0.5rem 0.7rem;
-  border-radius: 8px;
-  position: relative;
 }
 
 .message-system {
@@ -45,19 +87,26 @@
 .message-assistant {
   align-self: flex-start;
   background: darkslategray;
-  border: 1px solid #ddd;
 }
 
 .message-controls {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 0.5rem;
   margin-bottom: 0.3rem;
 }
 
+.message-assistant .message-controls {
+  flex-direction: row-reverse;
+}
+
+.message-controls label {
+  flex-direction: row;
+}
+
 .role-select {
-  width: 75%;
+  width: 10rem;
   padding: 0.3rem;
   font-size: 0.9rem;
 }
@@ -99,15 +148,8 @@
 }
 
 .add-message {
-  margin-top: 1rem;
-  align-self: center;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
   color: black;
   background: #f7f7f7;
-  cursor: pointer;
 }
 
 .total-tokens {

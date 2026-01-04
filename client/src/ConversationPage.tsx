@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import MessageCard from "./components/MessageCard";
 import type { Conversation, Message, OllamaModel } from "./types";
 import "./ConversationPage.css"
@@ -31,7 +31,7 @@ export default function ConversationPage() {
 
         const newMessage = await res.json();
 
-        setConversation((prev)=>
+        setConversation((prev) =>
             prev
                 ? { ...prev, messages: [...prev.messages, newMessage] }
                 : prev
@@ -42,11 +42,39 @@ export default function ConversationPage() {
         index: number,
         patch: Partial<Message>
     ) => {
-        setConversation((prev)=> {
+        setConversation((prev) => {
             if (!prev) return prev;
 
             const messages = [...prev.messages];
-            messages[index] = { ...messages[index], ...patch};
+            messages[index] = { ...messages[index], ...patch };
+
+            return { ...prev, messages };
+        });
+    };
+
+    const deleteMessage = (index: number) => {
+        setConversation((prev) => {
+            if (!prev) return prev;
+            const messages = prev.messages.filter((_, i) => i !== index);
+            return { ...prev, messages };
+        });
+    };
+
+    const moveMessage = (index: number, direction: "up" | "down") => {
+        setConversation((prev) => {
+            if (!prev) return prev;
+
+            const messages = [...prev.messages];
+            const newIndex = direction === "up" ? index - 1 : index + 1;
+
+            if (newIndex < 0 || newIndex >= messages.length) {
+                return prev;
+            }
+
+            [messages[index], messages[newIndex]] = [
+                messages[newIndex],
+                messages[index],
+            ];
 
             return { ...prev, messages };
         });
@@ -85,7 +113,7 @@ export default function ConversationPage() {
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(()=> {
+    useEffect(() => {
         bottomRef?.current?.scrollIntoView({ behavior: "smooth" });
     }, [conversation?.messages.length]);
 
@@ -128,7 +156,7 @@ export default function ConversationPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     model: conversation.model,
-                    messages: includedMessages.map(({ role, content}) => ({
+                    messages: includedMessages.map(({ role, content }) => ({
                         role,
                         content,
                     })),
@@ -198,7 +226,7 @@ export default function ConversationPage() {
     };
 
     const totalTokens = conversation?.messages
-        .filter((m)=> m.includeInQuery)
+        .filter((m) => m.includeInQuery)
         .reduce((sum, m) => sum + (m.tokens ?? 0), 0)
         ?? 0;
 
@@ -212,6 +240,7 @@ export default function ConversationPage() {
 
     return (
         <div className="container">
+            <Link to="/">Home</Link>
             <header className="conversation-header">
                 <h1>{conversation.name}</h1>
                 <div className="model">Model: {conversation.model}</div>
@@ -243,6 +272,9 @@ export default function ConversationPage() {
                         index={idx}
                         updateMessage={updateMessage}
                         requestTokenCount={requestTokenCount}
+                        deleteMessage={deleteMessage}
+                        moveMessage={moveMessage}
+                        lastIndex={conversation.messages.length - 1}
                     />
                 ))}
             </div>
