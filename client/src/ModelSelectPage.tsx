@@ -1,19 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import type { OllamaModel } from "./types";
 import "./ModelSelectPage.css";
 
 const BACK_END_URL = "http://localhost:3001/api";
-
-interface OllamaModel {
-    name: string;
-    size?: number;
-    digest?: string;
-    modified_at?: string;
-}
-
-interface OllamaTagsResponse {
-    models: OllamaModel[];
-}
 
 interface ConversationSummary {
     file: string;

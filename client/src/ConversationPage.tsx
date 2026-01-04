@@ -1,17 +1,25 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import MessageCard from "./components/MessageCard";
-import type { Conversation, Message } from "./types";
+import type { Conversation, Message, OllamaModel } from "./types";
 import "./ConversationPage.css"
 
 const BACK_END_URL = "http://localhost:3001/api";
-const DEBOUNCE_MS = 500; // Half second debounce
+const DEBOUNCE_UPDATE_MS = 500; // Half second debounce
 
 export default function ConversationPage() {
     const { file } = useParams<{ file: string }>();
     const [conversation, setConversation] = useState<Conversation | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [running, setRunning] = useState(false);
+    const [models, setModels] = useState<OllamaModel[]>([]);
+
+    useEffect(() => {
+        fetch(BACK_END_URL + "/models")
+            .then((res) => res.json())
+            .then((d) => setModels(d.models ?? []))
+            .catch((err) => setError(err.message));
+    }, []);
 
     const addMessage = async () => {
         const res = await fetch(
@@ -72,7 +80,7 @@ export default function ConversationPage() {
                     body: JSON.stringify(conversation),
                 }
             );
-        }, DEBOUNCE_MS);
+        }, DEBOUNCE_UPDATE_MS);
     }, [conversation]);
 
     const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -163,6 +171,37 @@ export default function ConversationPage() {
         setRunning(false);
     };
 
+    const requestTokenCount = async (
+        index: number,
+        content: string
+    ) => {
+        if (!conversation) return;
+
+        const res = await fetch(BACK_END_URL + "/tokens", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                model: conversation.model,
+                text: content,
+            }),
+        });
+
+        const { tokens } = await res.json();
+
+        setConversation((prev) => {
+            if (!prev) return prev;
+
+            const messages = [...prev.messages];
+            messages[index] = { ...messages[index], tokens };
+            return { ...prev, messages };
+        });
+    };
+
+    const totalTokens = conversation?.messages
+        .filter((m)=> m.includeInQuery)
+        .reduce((sum, m) => sum + (m.tokens ?? 0), 0)
+        ?? 0;
+
     if (error) {
         return <div className="container error">{error}</div>;
     }
@@ -178,6 +217,24 @@ export default function ConversationPage() {
                 <div className="model">Model: {conversation.model}</div>
             </header>
 
+            <label className="model-select">
+                Model
+                <select
+                    value={conversation.model}
+                    onChange={(e) =>
+                        setConversation((prev) =>
+                            prev ? { ...prev, model: e.target.value } : prev
+                        )
+                    }
+                >
+                    {models.map((model) => (
+                        <option key={model.name} value={model.name}>
+                            {model.name}
+                        </option>
+                    ))}
+                </select>
+            </label>
+
             <div className="messages">
                 {conversation?.messages.map((msg, idx) => (
                     <MessageCard
@@ -185,21 +242,28 @@ export default function ConversationPage() {
                         message={msg}
                         index={idx}
                         updateMessage={updateMessage}
+                        requestTokenCount={requestTokenCount}
                     />
                 ))}
             </div>
 
-            <button className="add-message" onClick={addMessage}>
-                + Add Message
-            </button>
+            <div className="action-row">
+                <button className="add-message" onClick={addMessage}>
+                    + Add Message
+                </button>
 
-            <button
-                className="run-prompt"
-                disabled={running}
-                onClick={runPrompt}
-            >
-                ▶ Run Prompt
-            </button>
+                <span className="total-tokens">
+                    {totalTokens} tokens
+                </span>
+
+                <button
+                    className="run-prompt"
+                    disabled={running}
+                    onClick={runPrompt}
+                >
+                    ▶ Run Prompt
+                </button>
+            </div>
 
             <div ref={bottomRef} />
         </div>

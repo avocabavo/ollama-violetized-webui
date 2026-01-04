@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import fs from "fs";
 import path from "path";
+import pkg from "@dqbd/tiktoken";
+const { encoding_for_model } = pkg;
 
 const app = express();
 const PORT = 3001;
@@ -205,6 +207,16 @@ app.post("/api/run/:name", async (req, res) => {
     }
 
     res.end();
+});
+
+/**
+ * POST /api/tokens
+ * Counts the tokens in the given model
+ */
+app.post("/api/tokens", (req, res) => {
+  const { text } = req.body;
+  const encoding = encoding_for_model("gpt2");
+  res.json({ tokens: encoding.encode(text).length });
 });
 
 app.listen(PORT, ()=> {

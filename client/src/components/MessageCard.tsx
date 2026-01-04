@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import type { Message } from "../types.ts";
 
+const DEBOUNCE_RECOUNT_MS = 2000;
+
 type Props = {
     message: Message;
     index: number;
@@ -8,12 +10,14 @@ type Props = {
         index: number,
         patch: Partial<Message>
     ) => void;
+    requestTokenCount: (index: number, content: string) => void;
 };
 
 export default function MessageCard({
     message,
     index,
     updateMessage,
+    requestTokenCount
 }: Props) {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -27,8 +31,8 @@ export default function MessageCard({
 
     useEffect(() => {
         const timeout = setTimeout(() => {
-            countTokens(index, message.content);
-        }, 4000);
+            requestTokenCount(index, message.content);
+        }, DEBOUNCE_RECOUNT_MS);
 
         return () => clearTimeout(timeout);
     }, [message.content]);
@@ -73,6 +77,10 @@ export default function MessageCard({
                 }
                 rows={Math.max(3, message.content.split("\n").length)}
             />
+
+            <div className="message-card-info">
+                {message.tokens ?? 0} tokens
+            </div>
         </div>
     )
 }

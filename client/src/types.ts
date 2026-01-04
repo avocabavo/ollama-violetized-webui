@@ -11,3 +11,10 @@ export type Conversation = {
     createdAt: string;
     messages: Message[];
 };
+
+export interface OllamaModel {
+    name: string;
+    size?: number;
+    digest?: string;
+    modified_at?: string;
+}

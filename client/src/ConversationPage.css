@@ -1,3 +1,21 @@
+.conversation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.model-select {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.model-select select {
+  padding: 0.3rem;
+}
+
 .messages {
   display: flex;
   flex-direction: column;
@@ -15,18 +33,18 @@
 
 .message-system {
   align-self: center;
-  background: #f0f0f0;
+  background: black;
   text-align: center;
 }
 
 .message-user {
   align-self: flex-end;
-  background: #dcf8c6; /* light green typical chat bubble */
+  background: indigo;
 }
 
 .message-assistant {
   align-self: flex-start;
-  background: #fff;
+  background: darkslategray;
   border: 1px solid #ddd;
 }
 
@@ -53,7 +71,7 @@
 .message textarea {
   width: 100%;
   border: none;
-  background: darkslategray;
+  background: transparent;
   resize: none;
   overflow: hidden;
   font-family: inherit;
@@ -65,6 +83,20 @@
   outline: none;
 }
 
+.message-card-info {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  text-align: right;
+  margin-top: 0.2rem;
+}
+
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
 
 .add-message {
   margin-top: 1rem;
@@ -76,6 +108,11 @@
   color: black;
   background: #f7f7f7;
   cursor: pointer;
+}
+
+.total-tokens {
+  font-size: 0.85rem;
+  opacity: 0.7;
 }
 
 
