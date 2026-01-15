@@ -1,4 +1,6 @@
+import "dotenv/config";
 import express from "express";
+import session from "express-session";
 import fs from "fs";
 import path from "path";
 import pkg from "@dqbd/tiktoken";
@@ -9,12 +11,79 @@ const PORT = 3001;
 const OLLAMA_HOST = "http://localhost:11434";
 const CONVERSATIONS_DIR = path.resolve("./conversations");
 
+if (!process.env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET is not set in .env");
+}
+if (!process.env.APP_PASSWORD) {
+    throw new  Error("APP_PASSWORD is not set in .env");
+}
+if (!fs.existsSync("users.json")) {
+    throw new Error("users.json missing - copy from users.example.json");
+}
+
+import { authenticate } from "./auth.js";
+
 app.use(express.json());
+
+app.use(
+    session({
+        name: "ollama-violetized-webui-session",
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            sameSite: "lax",
+        },
+    })
+);
+
+app.post("/api/login", (req, res) => {
+    var username, password;
+    try {
+        username = req.body.username;
+        password = req.body.password;
+    } catch (ex) {
+        console.log('Unable to find username and or password in req.body');
+        console.log(ex);
+        return res.status(400).json({ error: 'Invalid request body format'});
+    }
+
+    if (!authenticate(username, password)) {
+        return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    req.session.user = { username };
+
+    res.json({ ok: true });
+});
+
+app.post("/api/logout", (req, res) => {
+    req.session.destroy(() => {
+        res.json({ ok: true });
+    });
+});
+
+function requireAuth(req, res, next) {
+    if (!req.session.user) {
+        return res.status(401).json({ error: "Not authenticated" });
+    }
+    next();
+}
+
+app.get("/api/me", (req, res)=> {
+    if (!req?.session?.user) {
+        return res.status(401).end();
+    }
+    res.json(req.session.user);
+});
+
+app.use("/api", requireAuth);
 
 /**
  * GET /api/models
  */
-app.get("/api/models", async (req, res)=> {
+app.get("/api/models", async (_req, res)=> {
     try {
         const response = await fetch(OLLAMA_HOST + "/api/tags");
         const data = await response.json();
@@ -59,7 +128,7 @@ app.post("/api/conversations", (req, res) => {
  * GET /api/conversations
  * Lists existing conversations
  */
-app.get("/api/conversations", (req, res)=> {
+app.get("/api/conversations", (_req, res)=> {
     try {
         const files = fs.readdirSync(CONVERSATIONS_DIR);
 
@@ -89,7 +158,7 @@ app.get("/api/conversations", (req, res)=> {
  * Loads a single conversation JSON
  */
 app.get("/api/conversations/:file", (req, res)=> {
-    const { file } = req. params;
+    const { file } = req.params;
 
     // Prevent path traversal
     if (!/^[a-z0-9_.-]+\.json$/.test(file)) {
