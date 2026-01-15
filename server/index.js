@@ -14,9 +14,6 @@ const CONVERSATIONS_DIR = path.resolve("./conversations");
 if (!process.env.SESSION_SECRET) {
     throw new Error("SESSION_SECRET is not set in .env");
 }
-if (!process.env.APP_PASSWORD) {
-    throw new  Error("APP_PASSWORD is not set in .env");
-}
 if (!fs.existsSync("users.json")) {
     throw new Error("users.json missing - copy from users.example.json");
 }
