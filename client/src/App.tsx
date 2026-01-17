@@ -3,12 +3,17 @@ import { Routes, Route } from "react-router-dom";
 import ConversationSelectPage from "./ConversationSelectPage";
 import ConversationPage from "./ConversationPage";
 
-import { checkAuth } from "./Auth";
+import { checkAuth, logout } from "./Auth";
 import { LoginPage } from "./LoginPage";
 
 function App() {
   const [authChecked, setAuthChecked] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+
+  async function handleLogout() {
+    await logout();
+    setAuthenticated(false);
+  }
 
   useEffect(()=> {
     checkAuth()
@@ -26,8 +31,11 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<ConversationSelectPage />} />
-      <Route path="/conversation/:file" element={<ConversationPage />} />
+      <Route path="/" element={<ConversationSelectPage onLogout={handleLogout} />} />
+      <Route
+        path="/conversation/:file"
+        element={<ConversationPage onLogout={handleLogout} />}
+      />
     </Routes>
   );
 }

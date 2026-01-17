@@ -5,4 +5,14 @@ async function checkAuth(): Promise<boolean> {
   return res.ok;
 }
 
-export { checkAuth };
+async function logout() {
+  const res = await fetch("/api/logout", {
+    method: "POST"
+  });
+
+  if (!res.ok) {
+    throw new Error("Logout failed");
+  }
+}
+
+export { checkAuth, logout };

@@ -10,7 +10,7 @@ interface ConversationSummary {
     createdAt: string;
 }
 
-export default function ConversationSelectPage() {
+export default function ConversationSelectPage({ onLogout }: { onLogout: () => void }) {
     const [models, setModels] = useState<OllamaModel[]>([]);
     const [selectedModel, setSelectedModel] = useState<string>("");
     const [conversationName, setConversationName] = useState("");
@@ -58,6 +58,12 @@ export default function ConversationSelectPage() {
 
     return (
         <div className="container">
+            <div className="nav">
+                <a href="#" onClick={e => { e.preventDefault(); onLogout(); }}>
+                    Logout
+                </a>
+            </div>
+
             <h1>Ollama Prompt Builder</h1>
 
             {error && <div className="error">{error}</div>}

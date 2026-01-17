@@ -6,7 +6,7 @@ import "./ConversationPage.css"
 
 const DEBOUNCE_UPDATE_MS = 500; // Half second debounce
 
-export default function ConversationPage() {
+export default function ConversationPage({ onLogout }: { onLogout: () => void }) {
     const { file } = useParams<{ file: string }>();
     const [conversation, setConversation] = useState<Conversation | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -239,7 +239,13 @@ export default function ConversationPage() {
 
     return (
         <div className="container">
-            <Link to="/">Home</Link>
+            <div className="nav">
+                <a href="#" onClick={e => { e.preventDefault(); onLogout(); }}>
+                    Logout
+                </a>
+                <Link to="/">Home</Link>
+            </div>
+
             <header className="conversation-header">
                 <h1>{conversation.name}</h1>
                 <div className="model">Model: {conversation.model}</div>
