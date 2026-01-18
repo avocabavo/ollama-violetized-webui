@@ -158,7 +158,7 @@ app.get("/api/conversations/:file", (req, res)=> {
     const { file } = req.params;
 
     // Prevent path traversal
-    if (!/^[a-z0-9_.-]+\.json$/.test(file)) {
+    if (!/^[a-zA-Z0-9_.-]+\.json$/.test(file)) {
         return res.status(400).json({ error: "Invalid filename" });
     }
 
@@ -183,7 +183,7 @@ app.post("/api/conversations/:file/messages", (req, res) => {
     const { file } = req.params;
 
     // Prevent path traversal
-    if (!/^[a-z0-9_.-]+\.json$/.test(file)) {
+    if (!/^[a-zA-Z0-9_.-]+\.json$/.test(file)) {
         return res.status(400).json({ error: "Invalid filename" });
     }
 
@@ -220,7 +220,7 @@ app.put("/api/conversations/:file", (req, res) => {
     const { file } = req.params;
 
     // Prevent path traversal
-    if (!/^[a-z0-9_.-]+\.json$/.test(file)) {
+    if (!/^[a-zA-Z0-9_.-]+\.json$/.test(file)) {
         return res.status(400).json({ error: "Invalid filename" });
     }
 

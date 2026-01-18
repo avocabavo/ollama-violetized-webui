@@ -18,16 +18,23 @@ export default function ConversationSelectPage({ onLogout }: { onLogout: () => v
     const [success, setSuccess] = useState<string | null>(null);
     const [conversations, setConversations] = useState<ConversationSummary[]>([]);
 
-    useEffect(() => {
+    function fetchModels() {
         fetch("/api/models")
             .then((r) => r.json())
             .then((d) => setModels(d.models ?? []))
             .catch(() => setError("Failed to load models"));
+    }
 
+    function fetchConversations() {
         fetch("/api/conversations")
             .then((r) => r.json())
             .then((d) => setConversations(d.conversations ?? []))
             .catch(() => setError("Failed to load conversations"));
+    }
+
+    useEffect(() => {
+        fetchModels();
+        fetchConversations();
     }, []);
 
     async function createConversation() {
@@ -51,6 +58,7 @@ export default function ConversationSelectPage({ onLogout }: { onLogout: () => v
 
             setSuccess(`Conversation created: ${data.name}`);
             setConversationName("");
+            fetchConversations();
         } catch (err) {
             setError((err as Error).message);
         }
@@ -95,6 +103,7 @@ export default function ConversationSelectPage({ onLogout }: { onLogout: () => v
             </label>
 
             <button
+                className="form-button"
                 disabled={!selectedModel || !conversationName}
                 onClick={createConversation}
             >
