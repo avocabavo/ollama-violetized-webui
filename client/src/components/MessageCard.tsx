@@ -43,8 +43,14 @@ export default function MessageCard({
         return () => clearTimeout(timeout);
     }, [message.content]);
 
+    function handleContainerClick(e: React.MouseEvent<HTMLDivElement>) {
+        if (e.target === e.currentTarget) {
+            textareaRef.current?.focus();
+        }
+    }
+
     return (
-        <div className={`message-row message-${message.role}`}>
+        <div className={`message-row message-${message.role}`} onClick={handleContainerClick}>
             <div className="message-actions">
                 <button
                     onClick={() => moveMessage(index, "up")}
@@ -65,7 +71,7 @@ export default function MessageCard({
             </div>
 
             <div className={`message message-${message.role}`}>
-                <div className="message-controls">
+                <div className="message-controls" onClick={handleContainerClick}>
                     <select
                         value={message.role}
                         className="role-select"
