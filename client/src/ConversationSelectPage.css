@@ -40,5 +40,14 @@ select {
 }
 
 .form-button {
-  margin-top: 0.5em;
+  margin-top: 0.5rem;
+}
+
+.conv-meta {
+  color: #BBB;
+  font-size: 0.9rem;
+}
+
+.meta-sep {
+  margin: 0 0.5rem;
 }

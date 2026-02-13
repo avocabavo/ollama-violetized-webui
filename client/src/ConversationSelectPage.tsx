@@ -10,6 +10,10 @@ interface ConversationSummary {
     createdAt: string;
 }
 
+function formatDateTime(value: string | number | Date): string {
+    return new Date(value).toLocaleString('en-CA', {hour12: false});
+}
+
 export default function ConversationSelectPage({ onLogout }: { onLogout: () => void }) {
     const [models, setModels] = useState<OllamaModel[]>([]);
     const [selectedModel, setSelectedModel] = useState<string>("");
@@ -119,8 +123,9 @@ export default function ConversationSelectPage({ onLogout }: { onLogout: () => v
                                 <Link to={`/conversation/${c.file}`} className="conv-link">
                                     <h3 className="conv-name">{c.name}</h3>
                                     <div className="conv-meta">
-                                        {c.model} .{" "}
-                                        {new Date(c.createdAt).toLocaleString()}1
+                                        <span>{c.model}</span>
+                                        <span className="meta-sep">•</span>
+                                        <span>{formatDateTime(c.createdAt)}</span>
                                     </div>
                                 </Link>
                             </li>
